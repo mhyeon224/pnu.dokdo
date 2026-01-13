@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>독도: 지리적 특성과 수호의 역사</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Guardian of the East Sea (Warm Stone & Ocean Blue) -->
+    <!-- Application Structure Plan: 
+         1. Hero Section: Emotional connection and high-level introduction.
+         2. Geographic Data Dashboard: Quantitative visualization of location and area using Chart.js to establish physical reality.
+         3. Historical Archives: Interactive tabbed interface to explore key documents (Korean vs. Japanese records) allowing users to compare evidence.
+         4. Sovereignty Timeline: Vertical timeline to visualize the continuity of history from 512 AD to present.
+         5. Conflict & Resolution: Card-based layout to categorize complex modern issues and solutions.
+         This structure moves from physical fact -> historical proof -> temporal continuity -> current status, fostering logical understanding.
+    -->
+    <!-- Visualization & Content Choices:
+         1. Distance Bar Chart: Shows 87.4km vs 157.5km. Goal: Prove visibility. Interaction: Tooltip details.
+         2. Area Doughnut Chart: Breakdown of East/West Islets. Goal: Show physical composition. Interaction: Segment hover.
+         3. Document Selector: Clickable list updating a content panel. Goal: Organize text-heavy historical evidence.
+         4. Timeline: HTML/CSS vertical flow. Goal: Show sequence.
+         NO SVG/Mermaid used.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        
+        /* Chart Container Styling per requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px; /* Base height */
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Custom Scrollbar for document list */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f1f4; 
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 3px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 antialiased selection:bg-blue-100 selection:text-blue-900">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-stone-50/90 backdrop-blur-md border-b border-stone-200 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <span class="text-xl font-bold text-blue-900">독도 바로 알기</span>
+                </div>
+                
+                <!-- Desktop Navigation and Home Button -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <button onclick="scrollToSection('geo')" class="text-stone-600 hover:text-blue-700 font-medium transition">지리적 특성</button>
+                    <button onclick="scrollToSection('history')" class="text-stone-600 hover:text-blue-700 font-medium transition">역사적 증거</button>
+                    <button onclick="scrollToSection('timeline')" class="text-stone-600 hover:text-blue-700 font-medium transition">역사 연대기</button>
+                    <button onclick="scrollToSection('conflict')" class="text-stone-600 hover:text-blue-700 font-medium transition">갈등과 해결</button>
+                    <!-- New Home Button on the Right -->
+                    <a href="index.html" class="bg-blue-700 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-800 transition shadow-sm">
+                        홈
+                    </a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-stone-600 hover:text-blue-900 focus:outline-none">
+                        <span class="text-2xl">☰</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-stone-200">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <button onclick="scrollToSection('geo')" class="block w-full text-left px-3 py-2 text-stone-600 hover:bg-blue-50 hover:text-blue-900 rounded-md">지리적 특성</button>
+                <button onclick="scrollToSection('history')" class="block w-full text-left px-3 py-2 text-stone-600 hover:bg-blue-50 hover:text-blue-900 rounded-md">역사적 증거</button>
+                <button onclick="scrollToSection('timeline')" class="block w-full text-left px-3 py-2 text-stone-600 hover:bg-blue-50 hover:text-blue-900 rounded-md">역사 연대기</button>
+                <button onclick="scrollToSection('conflict')" class="block w-full text-left px-3 py-2 text-stone-600 hover:bg-blue-50 hover:text-blue-900 rounded-md">갈등과 해결</button>
+                <a href="index.html" class="block w-full text-center px-3 py-3 mt-2 bg-blue-700 text-white font-bold rounded-md">홈으로 이동</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="pt-32 pb-20 bg-gradient-to-b from-blue-50 to-stone-50 px-4">
+        <div class="max-w-5xl mx-auto text-center">
+            <div class="inline-block px-4 py-1.5 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold mb-6">대한민국 천연기념물 제336호</div>
+            <h1 class="text-4xl md:text-6xl font-bold text-slate-900 mb-6 leading-tight">
+                대한민국의 아침이 시작되는 곳,<br><span class="text-blue-700">독도 (Dokdo)</span>
+            </h1>
+            <p class="text-lg md:text-xl text-stone-600 max-w-3xl mx-auto mb-10 leading-relaxed">
+                독도는 역사적, 지리적, 국제법적으로 명백한 대한민국의 영토입니다.<br>
+                지리적 특성과 수호의 역사를 통해 독도를 올바르게 이해하고 지켜나가야 합니다.
+            </p>
+            <div class="flex justify-center gap-4">
+                <button onclick="scrollToSection('geo')" class="bg-blue-700 hover:bg-blue-800 text-white px-8 py-3 rounded-lg font-semibold shadow-lg transition transform hover:-translate-y-0.5">
+                    독도 탐험하기
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Section 1: Geographic Characteristics -->
+    <section id="geo" class="py-20 px-4 max-w-7xl mx-auto scroll-mt-20">
+        <div class="mb-12">
+            <h2 class="text-3xl font-bold text-slate-900 mb-4 border-l-4 border-blue-600 pl-4">1. 독도의 지리적 특성</h2>
+            <p class="text-stone-600 text-lg">
+                독도는 울릉도 동남쪽 87.4km 해상에 위치한 화산섬입니다. 맑은 날 울릉도에서 육안으로 확인할 수 있다는 점은 역사적으로 독도가 울릉도의 생활권이었음을 증명하는 중요한 지리적 근거가 됩니다.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            <!-- Chart 1: Visibility & Distance -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-stone-100">
+                <h3 class="text-xl font-bold text-slate-800 mb-2">🔭 가시거리 비교 (거리 분석)</h3>
+                <p class="text-sm text-stone-500 mb-6">울릉도와 일본 오키섬에서 독도까지의 거리 비교. 거리가 가까울수록 육안 관측이 용이하여 영유권 인식의 기초가 됩니다.</p>
+                
+                <div class="chart-container">
+                    <canvas id="distanceChart"></canvas>
+                </div>
+                <div class="mt-4 bg-blue-50 p-4 rounded-lg text-sm text-blue-800">
+                    <strong>💡 핵심 포인트:</strong> 독도는 울릉도에서 육안으로 보이지만(87.4km), 일본 오키섬(157.5km)에서는 보이지 않습니다. 이는 <span class="font-semibold">세종실록지리지</span>의 기록을 지리적으로 뒷받침합니다.
+                </div>
+            </div>
+
+            <!-- Chart 2: Island Composition -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-stone-100">
+                <h3 class="text-xl font-bold text-slate-800 mb-2">⛰️ 독도의 구성 (면적 분석)</h3>
+                <p class="text-sm text-stone-500 mb-6">동도와 서도, 그리고 89개의 부속 도서로 이루어진 독도의 면적 구성입니다.</p>
+                
+                <div class="chart-container">
+                    <canvas id="areaChart"></canvas>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mt-6">
+                    <div class="bg-stone-50 p-3 rounded text-center">
+                        <div class="text-xs text-stone-500">총 면적</div>
+                        <div class="font-bold text-slate-800">187,554 ㎡</div>
+                    </div>
+                    <div class="bg-stone-50 p-3 rounded text-center">
+                        <div class="text-xs text-stone-500">비교</div>
+                        <div class="font-bold text-slate-800">잠실운동장 약 2배</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+            <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-green-500 hover:shadow-md transition">
+                <div class="text-2xl mb-3">📍</div>
+                <h4 class="font-bold text-lg mb-2">행정 구역</h4>
+                <p class="text-stone-600 text-sm leading-relaxed">
+                    경상북도 울릉군 울릉읍 독도리<br>
+                    <strong>동도:</strong> 이사부길<br>
+                    <strong>서도:</strong> 안용복길
+                </p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-indigo-500 hover:shadow-md transition">
+                <div class="text-2xl mb-3">🌍</div>
+                <h4 class="font-bold text-lg mb-2">좌표 및 형성</h4>
+                <p class="text-stone-600 text-sm leading-relaxed">
+                    북위 37° 14′ 26.8″<br>
+                    동경 131° 52′ 10.4″<br>
+                    약 460~250만 년 전 형성된 화산섬 (제주도보다 오래됨)
+                </p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-yellow-500 hover:shadow-md transition">
+                <div class="text-2xl mb-3">💎</div>
+                <h4 class="font-bold text-lg mb-2">가치</h4>
+                <p class="text-stone-600 text-sm leading-relaxed">
+                    <strong>경제:</strong> 황금어장, 가스 하이드레이트(6억 톤)<br>
+                    <strong>군사:</strong> 동북아 방위 요충지<br>
+                    <strong>학술:</strong> 지질 및 기후 연구 최적지
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Historical Evidence -->
+    <section id="history" class="py-20 bg-stone-100">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="mb-12">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4 border-l-4 border-blue-600 pl-4">2. 사료로 보는 독도</h2>
+                <p class="text-stone-600 text-lg">
+                    한국의 고문헌뿐만 아니라, 일본의 공식 문서들조차 독도가 한국의 영토임을 명확히 기록하고 있습니다.
+                </p>
+            </div>
+
+            <div class="flex flex-col lg:flex-row gap-8 bg-white rounded-2xl shadow-sm overflow-hidden min-h-[500px]">
+                <!-- Document List Sidebar -->
+                <div class="lg:w-1/3 bg-stone-50 border-r border-stone-200 flex flex-col">
+                    <div class="p-5 border-b border-stone-200 bg-white">
+                        <h3 class="font-bold text-slate-800">📜 역사적 기록 선택</h3>
+                        <p class="text-xs text-stone-500 mt-1">항목을 클릭하여 상세 내용을 확인하세요.</p>
+                    </div>
+                    <div class="overflow-y-auto custom-scroll flex-1 p-2 space-y-1" id="doc-list">
+                        <!-- JS generated list items -->
+                    </div>
+                </div>
+
+                <!-- Document Detail View -->
+                <div class="lg:w-2/3 p-8 flex flex-col justify-center" id="doc-detail-panel">
+                    <div class="text-center text-stone-400">
+                        <span class="text-4xl block mb-4">👈</span>
+                        왼쪽 목록에서 역사적 사료를 선택해주세요.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Timeline -->
+    <section id="timeline" class="py-20 px-4 max-w-5xl mx-auto">
+        <div class="mb-12 text-center">
+            <h2 class="text-3xl font-bold text-slate-900 mb-4 inline-block border-b-4 border-blue-200 pb-1">3. 독도 영유권 연대기</h2>
+            <p class="text-stone-600 mt-4">512년 우산국 복속부터 현대에 이르기까지, 독도를 지켜온 역사의 흐름입니다.</p>
+        </div>
+
+        <div class="relative border-l-4 border-blue-100 ml-4 md:ml-0 space-y-12">
+            <!-- Timeline Item 1 -->
+            <div class="relative pl-8 md:pl-0">
+                <div class="md:w-1/2 md:pr-12 md:text-right md:ml-0">
+                    <span class="text-blue-600 font-bold text-xl block mb-1">512년</span>
+                    <h3 class="text-lg font-bold text-slate-800">신라 우산국 복속</h3>
+                    <p class="text-stone-600 mt-2 text-sm bg-white p-4 rounded-lg shadow-sm border border-stone-100 inline-block">
+                        이사부가 우산국을 정벌하며 독도가 우리 역사에 편입되었습니다.
+                    </p>
+                </div>
+                <div class="absolute top-1 left-[-10px] md:left-1/2 md:-ml-3 w-6 h-6 bg-blue-500 rounded-full border-4 border-white shadow-md z-10"></div>
+            </div>
+
+            <!-- Timeline Item 2 -->
+            <div class="relative pl-8 md:pl-0">
+                <div class="md:w-1/2 md:ml-auto md:pl-12">
+                    <span class="text-blue-600 font-bold text-xl block mb-1">1696년</span>
+                    <h3 class="text-lg font-bold text-slate-800">안용복 사건</h3>
+                    <p class="text-stone-600 mt-2 text-sm bg-white p-4 rounded-lg shadow-sm border border-stone-100 inline-block">
+                        일본 막부로부터 '울릉도 도해 금지령'을 이끌어내어 조선의 영토임을 확인받았습니다.
+                    </p>
+                </div>
+                <div class="absolute top-1 left-[-10px] md:left-1/2 md:-ml-3 w-6 h-6 bg-white border-4 border-blue-500 rounded-full shadow-md z-10"></div>
+            </div>
+
+            <!-- Timeline Item 3 -->
+            <div class="relative pl-8 md:pl-0">
+                <div class="md:w-1/2 md:pr-12 md:text-right md:ml-0">
+                    <span class="text-blue-600 font-bold text-xl block mb-1">1900년</span>
+                    <h3 class="text-lg font-bold text-slate-800">대한제국 칙령 제41호</h3>
+                    <p class="text-stone-600 mt-2 text-sm bg-white p-4 rounded-lg shadow-sm border border-stone-100 inline-block">
+                        고종 황제가 독도(석도)를 울릉군 관할로 명시하여 근대적 영유권을 공고화했습니다.
+                    </p>
+                </div>
+                <div class="absolute top-1 left-[-10px] md:left-1/2 md:-ml-3 w-6 h-6 bg-white border-4 border-blue-500 rounded-full shadow-md z-10"></div>
+            </div>
+
+            <!-- Timeline Item 4 -->
+            <div class="relative pl-8 md:pl-0">
+                <div class="md:w-1/2 md:ml-auto md:pl-12">
+                    <span class="text-red-500 font-bold text-xl block mb-1">1905년</span>
+                    <h3 class="text-lg font-bold text-slate-800">시마네현 고시 제40호 (불법)</h3>
+                    <p class="text-stone-600 mt-2 text-sm bg-white p-4 rounded-lg shadow-sm border border-stone-100 inline-block">
+                        일본이 러일전쟁 중 독도를 '주인 없는 땅'이라 주장하며 불법 강제 편입했습니다.
+                    </p>
+                </div>
+                <div class="absolute top-1 left-[-10px] md:left-1/2 md:-ml-3 w-6 h-6 bg-red-500 rounded-full border-4 border-white shadow-md z-10"></div>
+            </div>
+
+            <!-- Timeline Item 5 -->
+            <div class="relative pl-8 md:pl-0">
+                <div class="md:w-1/2 md:pr-12 md:text-right md:ml-0">
+                    <span class="text-blue-600 font-bold text-xl block mb-1">1946년</span>
+                    <h3 class="text-lg font-bold text-slate-800">SCAPIN 제677호</h3>
+                    <p class="text-stone-600 mt-2 text-sm bg-white p-4 rounded-lg shadow-sm border border-stone-100 inline-block">
+                        연합군 최고사령부가 독도를 일본의 통치권에서 공식적으로 제외했습니다.
+                    </p>
+                </div>
+                <div class="absolute top-1 left-[-10px] md:left-1/2 md:-ml-3 w-6 h-6 bg-white border-4 border-blue-500 rounded-full shadow-md z-10"></div>
+            </div>
+
+            <!-- Timeline Item 6 -->
+            <div class="relative pl-8 md:pl-0">
+                <div class="md:w-1/2 md:ml-auto md:pl-12">
+                    <span class="text-blue-600 font-bold text-xl block mb-1">1953년</span>
+                    <h3 class="text-lg font-bold text-slate-800">독도의용수비대 활동</h3>
+                    <p class="text-stone-600 mt-2 text-sm bg-white p-4 rounded-lg shadow-sm border border-stone-100 inline-block">
+                        홍순칠 등 민간인들이 자발적으로 무장하여 일본의 침범으로부터 독도를 수호했습니다.
+                    </p>
+                </div>
+                <div class="absolute top-1 left-[-10px] md:left-1/2 md:-ml-3 w-6 h-6 bg-white border-4 border-blue-500 rounded-full shadow-md z-10"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Conflict & Resolution -->
+    <section id="conflict" class="py-20 bg-blue-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="mb-12">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4 border-l-4 border-blue-600 pl-4">4. 한일 갈등과 해결 방안</h2>
+                <p class="text-stone-600 text-lg">
+                    독도를 둘러싼 갈등은 단순한 영토 문제를 넘어 역사 인식의 문제입니다. 갈등의 원인을 정확히 알고 평화적 해결을 모색해야 합니다.
+                </p>
+            </div>
+
+            <!-- Conflict Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition">
+                    <div class="text-red-500 text-sm font-bold mb-2">갈등 원인 1</div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-2">샌프란시스코 강화조약 (1951)</h3>
+                    <p class="text-stone-600 text-sm">최종 조약문에서 독도 명칭이 누락된 것을 빌미로 일본이 영유권을 주장하기 시작했습니다.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition">
+                    <div class="text-red-500 text-sm font-bold mb-2">갈등 원인 2</div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-2">신한일 어업협정 (1998)</h3>
+                    <p class="text-stone-600 text-sm">독도가 한일 중간수역에 포함되면서 영유권 논란이 재점화되었습니다.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition">
+                    <div class="text-red-500 text-sm font-bold mb-2">갈등 원인 3</div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-2">역사 교과서 왜곡</h3>
+                    <p class="text-stone-600 text-sm">일본 교과서에 독도를 '일본 고유 영토'로 기술하여 왜곡된 역사 인식을 확산시키고 있습니다.</p>
+                </div>
+            </div>
+
+            <!-- Resolution & Action -->
+            <div class="bg-white rounded-2xl p-8 shadow-sm border border-blue-100">
+                <h3 class="text-xl font-bold text-slate-900 mb-6 text-center">🕊️ 평화적 해결을 위한 우리의 노력</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">🛡️</div>
+                        <h4 class="font-bold text-slate-800 mb-2">실효적 지배 강화</h4>
+                        <p class="text-stone-600 text-sm">독도경비대 상주, 국민 방문 등 실질적인 주권 행사를 지속합니다.</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">📚</div>
+                        <h4 class="font-bold text-slate-800 mb-2">정확한 역사 교육</h4>
+                        <p class="text-stone-600 text-sm">감정적 대응이 아닌 사료와 국제법에 근거한 논리적 지식을 습득합니다.</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">🤝</div>
+                        <h4 class="font-bold text-slate-800 mb-2">민간 학술 교류</h4>
+                        <p class="text-stone-600 text-sm">한일 역사 공동 연구 및 청소년 교류를 통해 상호 이해를 증진합니다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-300 py-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="text-2xl font-bold text-white mb-4">독도 (Dokdo)</h2>
+            <p class="mb-8 max-w-2xl mx-auto">독도는 외로운 섬이 아닙니다. 5천만 대한민국 국민이 함께 지키는 우리 땅입니다.<br>올바른 역사 인식으로 동아시아의 평화를 만들어 갑시다.</p>
+            <div class="border-t border-slate-700 pt-8 text-sm text-slate-500">
+                <p>© 독도 종합 보고서 기반 대화형 웹 애플리케이션.</p>
+                <p class="mt-2">자료 출처: 세종실록지리지, 태정관 지령, 외교부 독도 정보</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // State Management
+        const state = {
+            currentDocId: null,
+            documents: [
+                {
+                    id: 'doc1',
+                    title: '세종실록지리지',
+                    year: '1454년',
+                    type: 'korea',
+                    summary: '조선의 관찬 지리서. 울릉도와 독도가 강원도 울진현 소속임을 명시.',
+                    quote: "우산(독도)과 무릉(울릉도) 두 섬이 (울진)현의 정동쪽 바다에 있다. 두 섬이 서로 거리가 멀지 않아 날씨가 맑으면 바라볼 수 있다.",
+                    significance: "독도가 조선의 영토임을 입증하는 가장 대표적인 공식 기록. '육안 관측 가능성'은 지리적 인지 범위를 뜻함."
+                },
+                {
+                    id: 'doc2',
+                    title: '대한제국 칙령 제41호',
+                    year: '1900년',
+                    type: 'korea',
+                    summary: '고종 황제가 반포한 근대적 법령. 독도를 울릉군 관할로 편입.',
+                    quote: "제2조: 군청 위치는 태하동으로 정하고 구역은 울릉전도와 죽도, 석도(독도)를 관할 할 것.",
+                    significance: "국제법적으로 독도에 대한 영유권을 확고히 한 근대 국가의 법적 조치. '석도'가 독도임을 증명."
+                },
+                {
+                    id: 'doc3',
+                    title: '은주시청합기',
+                    year: '1667년',
+                    type: 'japan',
+                    summary: '일본의 고문헌. 일본의 경계를 오키섬으로 한정함.',
+                    quote: "이 두 개의 섬(울릉도, 독도)에서 고려(조선)를 보는 것은 마치 운슈에서 오키섬을 보는 것과 같다. 그러므로 본 주의 서북쪽 경계는 오키섬으로 한다.",
+                    significance: "일본 스스로 독도와 울릉도가 자국의 영토 밖(조선 땅)임을 인정한 최초의 일본 문헌."
+                },
+                {
+                    id: 'doc4',
+                    title: '태정관 지령',
+                    year: '1877년',
+                    type: 'japan',
+                    summary: '메이지 정부 최고 행정기관의 공식 문서.',
+                    quote: "품의한 취지의 죽도(울릉도) 외 1도(독도)의 건에 대해서 본방(일본)은 관계가 없다는 것을 명심할 것.",
+                    significance: "근대 일본 정부가 독도가 한국 영토임을 공식적으로 확인한 결정적 증거."
+                },
+                {
+                    id: 'doc5',
+                    title: '팔도총도',
+                    year: '1481년',
+                    type: 'korea',
+                    summary: '신증동국여지승람에 첨부된 지도.',
+                    quote: "(지도상에 우산도와 울릉도 두 개의 섬이 그려져 있음)",
+                    significance: "한국 지도 중 독도가 그려진 최초의 지도로, 당시 사람들이 두 섬의 존재를 명확히 인지했음을 보여줌."
+                },
+                {
+                    id: 'doc6',
+                    title: '삼국접양지도',
+                    year: '1785년',
+                    type: 'japan',
+                    summary: '일본인 하야시 시헤이가 제작한 지도.',
+                    quote: "(독도를 조선과 같은 황색으로 칠하고 옆에 '조선의 것'이라 명기함)",
+                    significance: "일본 지식인들도 독도를 조선의 영토로 인식했음을 보여주는 시각적 증거."
+                }
+            ]
+        };
+
+        // Navigation Logic
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+            // Close mobile menu if open
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Initialize Charts (Chart.js)
+        document.addEventListener('DOMContentLoaded', () => {
+            initDistanceChart();
+            initAreaChart();
+            renderDocumentList();
+            // Default select first doc
+            selectDocument('doc1');
+        });
+
+        function initDistanceChart() {
+            const ctx = document.getElementById('distanceChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['울릉도에서 독도', '오키섬에서 독도'],
+                    datasets: [{
+                        label: '거리 (km)',
+                        data: [87.4, 157.5],
+                        backgroundColor: [
+                            'rgba(37, 99, 235, 0.8)', // Blue for Korea side
+                            'rgba(156, 163, 175, 0.5)' // Gray for Japan side
+                        ],
+                        borderColor: [
+                            'rgb(37, 99, 235)',
+                            'rgb(156, 163, 175)'
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                footer: (items) => {
+                                    if(items[0].dataIndex === 0) return "육안 관측 가능 (생활권)";
+                                    return "육안 관측 불가능";
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: { display: true, text: '거리 (km)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initAreaChart() {
+            const ctx = document.getElementById('areaChart').getContext('2d');
+            // Total: 187,554. East: 73,297. West: 88,740. Others: 25,517.
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['동도', '서도', '부속 도서'],
+                    datasets: [{
+                        data: [73297, 88740, 25517],
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.8)', // Blue
+                            'rgba(16, 185, 129, 0.8)', // Green
+                            'rgba(245, 158, 11, 0.8)'  // Yellow
+                        ],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += context.parsed.toLocaleString() + ' ㎡';
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Document Viewer Logic
+        function renderDocumentList() {
+            const listEl = document.getElementById('doc-list');
+            listEl.innerHTML = state.documents.map(doc => `
+                <div onclick="selectDocument('${doc.id}')" 
+                     class="p-4 cursor-pointer rounded-lg hover:bg-blue-50 transition border border-transparent hover:border-blue-100 group"
+                     id="item-${doc.id}">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-slate-800 group-hover:text-blue-700">${doc.title}</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full ${doc.type === 'korea' ? 'bg-blue-100 text-blue-800' : 'bg-red-50 text-red-800'}">
+                            ${doc.type === 'korea' ? '한국 사료' : '일본 사료'}
+                        </span>
+                    </div>
+                    <div class="text-xs text-stone-500">${doc.year}</div>
+                </div>
+            `).join('');
+        }
+
+        function selectDocument(id) {
+            const doc = state.documents.find(d => d.id === id);
+            if (!doc) return;
+
+            // Update UI list selection
+            document.querySelectorAll('#doc-list > div').forEach(el => {
+                el.classList.remove('bg-blue-50', 'border-blue-200', 'shadow-sm');
+                el.classList.add('border-transparent');
+            });
+            const selectedItem = document.getElementById(`item-${id}`);
+            if (selectedItem) {
+                selectedItem.classList.add('bg-blue-50', 'border-blue-200', 'shadow-sm');
+                selectedItem.classList.remove('border-transparent');
+            }
+
+            // Update Detail Panel with Animation
+            const panel = document.getElementById('doc-detail-panel');
+            panel.innerHTML = `
+                <div class="fade-in">
+                    <div class="flex items-baseline gap-3 mb-6">
+                        <h3 class="text-3xl font-bold text-slate-900">${doc.title}</h3>
+                        <span class="text-xl text-stone-400 font-light">${doc.year}</span>
+                    </div>
+                    
+                    <div class="bg-stone-50 p-6 rounded-xl border border-stone-200 mb-6 relative">
+                        <div class="absolute top-4 left-4 text-4xl text-stone-200">❝</div>
+                        <p class="text-lg text-stone-700 italic relative z-10 leading-relaxed px-4">
+                            ${doc.quote}
+                        </p>
+                        <div class="absolute bottom-4 right-4 text-4xl text-stone-200">❞</div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-bold text-blue-800 mb-1">📋 요약</h4>
+                            <p class="text-stone-600">${doc.summary}</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-blue-800 mb-1">💡 역사적 의의</h4>
+                            <p class="text-stone-600">${doc.significance}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
